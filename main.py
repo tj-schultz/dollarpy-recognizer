@@ -54,13 +54,13 @@ class MainApplication(tk.Frame):
         self.score_entry = tk.Entry(self.recog_frame, width=8)
         self.match_label = tk.Label(self.recog_frame, text="Best Match:")
         self.match_entry = tk.Entry(self.recog_frame, width=32)
-        self.recog_button = tk.Button(self.recog_frame, text="Recognize Gesture", command=self.submit([]))
+        self.recog_button = tk.Button(self.recog_frame, width=64, text="Recognize Gesture", command=self.submit([]))
         self.recog_frame.pack(side="top")
         self.match_label.pack(side="left")
         self.match_entry.pack(side="left")
         self.score_label.pack(side="left")
         self.score_entry.pack(side="left")
-        self.recog_button.pack(side="left")
+        self.recog_button.pack(side="top")
 
         ## GUI -- Path length display
         self.length_frame = tk.Frame(root)
@@ -114,11 +114,13 @@ class MainApplication(tk.Frame):
 
     def submit(self, npath):
         ## calculate results and update results entries
-        results = self.R.recognize(self.npath, preprocess=True)
-        self.score_entry.delete(0, tk.END)
-        self.score_entry.insert(0, round(results[0][1], 2))
-        self.match_entry.delete(0, tk.END)
-        self.match_entry.insert(0, results[0][0])
+        #results = self.R.recognize(npath, preprocess=True)
+        results = []
+        if len(results) > 0:
+            self.score_entry.delete(0, tk.END)
+            self.score_entry.insert(0, round(results[0][1], 2))
+            self.match_entry.delete(0, tk.END)
+            self.match_entry.insert(0, results[0][0])
 
     ## returns pointer position
     def get_pointer_pos(self, event):
