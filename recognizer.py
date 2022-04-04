@@ -1,5 +1,5 @@
 """
-name: recognizer.py -- dollarstore-recognizer
+name: recognizer.py -- dollargeneral-recognizer
 description: Recognizer class with member functions to resample, rotate, scale/translate paths and
 run calculations to determine the score for a particular recognizer
 authors: TJ Schultz, Skylar McCain
