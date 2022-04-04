@@ -1,5 +1,5 @@
 """
-name: offline.py -- dollarstore-recognizer
+name: offline.py -- dollargeneral-recognizer
 description: alternative launch to perform a recognition loop
 and log results offline
 authors: TJ Schultz, Skylar McCain
