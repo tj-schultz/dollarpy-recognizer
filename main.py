@@ -1,5 +1,5 @@
 """
-name: main.py -- dollarstore-recognizer
+name: main.py -- dollargeneral-recognizer
 description: An implementation of the $-recognizer in python with a Canvas input
 authors: TJ Schultz, Skylar McCain
 date: 1/27/22
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
 
     ## define window properties
-    root.title("dollarstore-recognizer")
+    root.title("dollargeneral-recognizer")
     root.minsize(500, 700)
     root.maxsize(500, 700)
 
