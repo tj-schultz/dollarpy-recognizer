@@ -1,5 +1,5 @@
 """
-name: path.py -- dollarstore-recognizer
+name: path.py -- dollargeneral-recognizer
 description: Path and point object definitions
 authors: TJ Schultz, []
 date: 1/20/22
