@@ -1,8 +1,8 @@
 """
 name: path.py -- dollargeneral-recognizer
 description: Path and point object definitions
-authors: TJ Schultz, []
-date: 1/20/22
+authors: TJ Schultz, Skylar McCain
+date: 4/4/22
 """
 
 ## point class
