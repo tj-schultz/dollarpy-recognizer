@@ -1,5 +1,5 @@
 """
-name: dollar.py -- dollarstore-recognizer
+name: dollar.py -- dollargeneral-recognizer
 description: class definitions containing template paths for the $1 Recognizer
 authors: TJ Schultz, Skylar McCain
 date: 1/27/22
