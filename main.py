@@ -50,25 +50,29 @@ class MainApplication(tk.Frame):
 
         ## GUI -- Recognizer display
         self.recog_frame = tk.Frame(root)
-        self.score_label = tk.Label(self.recog_frame, text="Score:")
-        self.score_entry = tk.Entry(self.recog_frame, width=8)
         self.match_label = tk.Label(self.recog_frame, text="Best Match:")
         self.match_entry = tk.Entry(self.recog_frame, width=32)
-        self.recog_button = tk.Button(self.recog_frame, width=64, text="Recognize Gesture", command=self.submit([]))
+        self.recog_button = tk.Button(self.recog_frame, width=16, text="Recognize", command=self.submit)
         self.recog_frame.pack(side="top")
         self.match_label.pack(side="left")
         self.match_entry.pack(side="left")
-        self.score_label.pack(side="left")
-        self.score_entry.pack(side="left")
-        self.recog_button.pack(side="top")
+        self.recog_button.pack(side="bottom")
+
+
 
         ## GUI -- Path length display
         self.length_frame = tk.Frame(root)
+        self.score_label = tk.Label(self.length_frame, text="Score:")
+        self.score_entry = tk.Entry(self.length_frame, width=8)
         self.length_label = tk.Label(self.length_frame, text="Path Length:")
         self.length_entry = tk.Entry(self.length_frame, width=8)
+        self.score_label.pack(side="left")
+        self.score_entry.pack(side="left")
         self.length_frame.pack(side="top")
         self.length_label.pack(side="left")
         self.length_entry.pack(side="left")
+        self.length_entry.insert(0, "0.0")
+
 
 
 
@@ -87,6 +91,7 @@ class MainApplication(tk.Frame):
 
         ## recognizer instantiation
         self.R = rec.NDollarRecognizer()
+        self.R_old = rec.Recognizer()
 
     ## prompts new info window for app
     def info_window(self):
@@ -112,8 +117,9 @@ class MainApplication(tk.Frame):
         info_label.pack(side="top", fill="both", expand=False)
         #github_label.pack(side="top", fill="both", expand=False)
 
-    def submit(self, npath):
+    def submit(self):
         ## calculate results and update results entries
+        npath = self.pathcanvas.npath
         nrecognizer = rec.NDollarRecognizer()
         print(npath)
         results = nrecognizer.Recognize(npath, False, False, False)
@@ -122,6 +128,9 @@ class MainApplication(tk.Frame):
         self.score_entry.insert(0, round(results.score, 2))
         self.match_entry.delete(0, tk.END)
         self.match_entry.insert(0, results.name)
+        self.pathcanvas.clear()
+        self.length_entry.delete(0, tk.END)
+        self.length_entry.insert(0, 0.0)
 
     ## returns pointer position
     def get_pointer_pos(self, event):
@@ -135,12 +144,13 @@ class MainApplication(tk.Frame):
         self.pathcanvas.pen(event)
 
         ## updates previous path length display
+        length = float(self.length_entry.get())
         self.length_entry.delete(0, tk.END)
-        self.length_entry.insert(0, round(self.R.path_length(self.pathcanvas.path), 2))
+        self.length_entry.insert(0, round(self.R_old.path_length(self.pathcanvas.path), 2) + length)
         self.length_entry.update()
 
         ## resample path
-        self.pathcanvas.resampled = self.R.resample(self.pathcanvas.path, dollar.Dollar.prefs["n_points"])
+        self.pathcanvas.resampled = self.R_old.resample(self.pathcanvas.path, dollar.Dollar.prefs["n_points"])
 
         ## draws points if show_points
         if self.show_points.get():
@@ -180,7 +190,7 @@ if __name__ == "__main__":
     ## define window properties
     root.title("dollargeneral-recognizer")
     root.minsize(500, 700)
-    root.maxsize(500, 700)
+    #root.maxsize(500, 700)
 
     ## organize root geometry as window
     MainApplication(root).pack(side="top", fill="both", expand=True)
