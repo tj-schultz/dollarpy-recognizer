@@ -115,13 +115,13 @@ class MainApplication(tk.Frame):
     def submit(self, npath):
         ## calculate results and update results entries
         nrecognizer = rec.NDollarRecognizer()
-        results = nrecognizer.Recognize(npath, preprocess=True)
-        results = []
-        if len(results) > 0:
-            self.score_entry.delete(0, tk.END)
-            self.score_entry.insert(0, round(results[0][1], 2))
-            self.match_entry.delete(0, tk.END)
-            self.match_entry.insert(0, results[0][0])
+        print(npath)
+        results = nrecognizer.Recognize(npath, False, False, False)
+        # if len(results) > 0:
+        self.score_entry.delete(0, tk.END)
+        self.score_entry.insert(0, round(results.score, 2))
+        self.match_entry.delete(0, tk.END)
+        self.match_entry.insert(0, results.name)
 
     ## returns pointer position
     def get_pointer_pos(self, event):

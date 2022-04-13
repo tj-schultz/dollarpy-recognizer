@@ -10,7 +10,7 @@ from math import acos, atan, atan2, pi, sin, cos, sqrt, dist, radians, inf
 import path as pth
 import dollar
 import numpy as np
-
+from time import time 
 
 ## recognizer class containing canvas display methods for
 class Recognizer():
@@ -491,12 +491,14 @@ class NDollarRecognizer():
     #
     # The $N Gesture Recognizer API begins here -- 3 methods: Recognize(), AddGesture(), and DeleteUserGestures()
     #
-    def Recognize(strokes, useBoundedRotationInvariance, requireSameNoOfStrokes, useProtractor):
-        t0 = date.now()
+    def Recognize(self, strokes, useBoundedRotationInvariance, requireSameNoOfStrokes, useProtractor):
+        if len(strokes) == 0:
+            return Result("Null", 0.0, 0)
+        t0 = time()
         points = CombineStrokes(strokes) # make one connected unistroke from the given strokes
         candidate = Unistroke("", useBoundedRotationInvariance, points)
         u = -1
-        b = +Infinity
+        b = inf
         # for each multistroke template
         for multistroke in self.Multistrokes:
             # optional -- only attempt match when same # of component strokes
@@ -517,7 +519,7 @@ class NDollarRecognizer():
                             b = d 
                             # multistroke owner of unistroke
                             u = i 
-        t1 = date.now()
+        t1 = time()
         return (u == -1) if Result("No match.", 0.0, t1-t0) else Result(self.Multistrokes[u].Name, useProtractor if (1.0 - b) else (1.0 - b / HalfDiagonal), t1-t0)
     
     def AddGesture(name, useBoundedRotationInvariance, strokes):
@@ -573,7 +575,7 @@ def MakeUnistrokes(strokes, orders):
     return unistrokes
 
 def CombineStrokes(strokes):
-    return [(p.x, p.y) for p in s for s in strokes]
+    return [Point(p.x, p.y) for s in strokes for p in s]
 
 def Resample(points, n):
     D = 0.0
