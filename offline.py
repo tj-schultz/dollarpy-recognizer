@@ -18,10 +18,13 @@ import random
 import pandas as pd
 
 ## list of path types to read using filenames with '01-10' appended
-xml_filetypes = ["arrow", "caret", "check", "circle", "delete_mark", "left_curly_brace",\
+xml_filetypes_unistroke = ["arrow", "caret", "check", "circle", "delete_mark", "left_curly_brace",\
                  "left_sq_bracket", "pigtail", "zig_zag", "rectangle",\
                  "right_curly_brace", "right_sq_bracket", "star", "triangle",\
                  "v", "x"]
+xml_filetypes_multistroke = ["arrowhead", "asterisk", "D", "exclamation_point", "five_point_star",\
+                 "H", "half_note", "I", "line", "N", "null", "P", "pitchfork", "six_point_star", \
+                 "T", "X"]
 
 ## base dictionary of unprocessed input Path objects from xml
 xml_base = {}
@@ -32,21 +35,27 @@ xml_base = {}
 def read_XML_path(filepath):
   
      ## formed path
+    multistrokes = [] 
     xml_path = pth.Path()
 
     try:
         ## grab root of file
         tree = xmlmd.parse(filepath)
-        element = tree.documentElement
+        element = tree.getElementsByTagName("Gesture")[0]
 
-        ## parse the point tags
-        point_tags = element.getElementsByTagName("Point")
+        #parse the stroke tags
+        stroke_tags = element.getElementsByTagName("Stroke")
+        for stroke in stroke_tags:
+             ## parse the point tags
+            point_tags = stroke.getElementsByTagName("Point")
 
-        ## get attributes and build path object
-        for point in point_tags:
-            x = float(point.getAttribute("X"))
-            y = float(point.getAttribute("Y"))
-            xml_path.stitch(pth.Point(x, y))
+            ## get attributes and build path object
+            for point in point_tags:
+                x = float(point.getAttribute("X"))
+                y = float(point.getAttribute("Y"))
+                xml_path.stitch(pth.Point(x, y))
+            
+            multistrokes.append(xml_path)
 
         # text deebugging to find which files contained incomplete data
         # if len(xml_path) < 2:
@@ -56,7 +65,7 @@ def read_XML_path(filepath):
         print(e)
         print("Unable to read", filepath, "\n")
         
-    return xml_path
+    return multistrokes
 
 def random100_test(R):
 
@@ -128,28 +137,28 @@ def random100_test(R):
    
 if __name__ == "__main__":
 
+
     ## build xml_base
-    # modified to only read in data with appropiate constraints -- incomplete data encountered on Subject 3 and Subject 5
-    # mode information on this issue in Part 5 submission notes
-    for user_key in ["S01", "S02", "S04", "S06"]:                      ## for each user
+    for user_key in ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10"]:   ## for each user
         #user_key = "S%s" % str(i).zfill(2)
         xml_base[user_key] = {}                 ## add user key-dict
-        for prefix in xml_filetypes:            ## for each gesture
+        for prefix in xml_filetypes_multistroke:## for each gesture
             xml_base[user_key][prefix] = {}     ## add prefix key-dict
             for num in range(1, 11):            ## for each sample xml
                 file_key = str(num).zfill(2)
+                speed_key = "".join([user_key, str("finger-SLOW")])
 
                 ## read as DOM -- append to dictionary
                 xml_base[user_key][prefix][file_key] = read_XML_path(\
-                    os.path.join(os.getcwd(), "P4_Schultz_McCain/XML_samples", user_key, "%s%s.xml"\
+                    os.path.join(os.getcwd(), "Samples", user_key, speed_key, "%s-%s.xml"\
                                  % (prefix, file_key))
                 )
                
 
-    ## instantiate the recognizer and preprocess the template dictionary recursively
-    R = rec.Recognizer(xml_base, protractor=True)
+    #instantiate the recognizer and preprocess the template dictionary recursively
+    # R = rec.Recognizer(xml_base, protractor=True)
    
-    random100_test(R)
+    # random100_test(R)
     
 
     ## debug -- vectors should be of length 2 * 64 = 128
