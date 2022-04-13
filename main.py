@@ -86,7 +86,7 @@ class MainApplication(tk.Frame):
         self.info_frame.pack(side="bottom")
 
         ## recognizer instantiation
-        self.R = rec.Recognizer(dollar.Dollar.templates, protractor=False)
+        self.R = rec.NDollarRecognizer()
 
     ## prompts new info window for app
     def info_window(self):
@@ -114,7 +114,8 @@ class MainApplication(tk.Frame):
 
     def submit(self, npath):
         ## calculate results and update results entries
-        #results = self.R.recognize(npath, preprocess=True)
+        nrecognizer = rec.NDollarRecognizer()
+        results = nrecognizer.Recognize(npath, preprocess=True)
         results = []
         if len(results) > 0:
             self.score_entry.delete(0, tk.END)
