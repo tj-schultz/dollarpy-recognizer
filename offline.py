@@ -12,7 +12,7 @@ import xml.dom.minidom as xmlmd
 import csv
 import os
 import path as pth
-import recognizer as rec
+import ndollar as rec
 import dollar
 import random
 import pandas as pd
@@ -140,7 +140,6 @@ if __name__ == "__main__":
 
     ## build xml_base
     for user_key in ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10"]:   ## for each user
-        #user_key = "S%s" % str(i).zfill(2)
         xml_base[user_key] = {}                 ## add user key-dict
         for prefix in xml_filetypes_multistroke:## for each gesture
             xml_base[user_key][prefix] = {}     ## add prefix key-dict
@@ -153,10 +152,15 @@ if __name__ == "__main__":
                     os.path.join(os.getcwd(), "Samples", user_key, speed_key, "%s-%s.xml"\
                                  % (prefix, file_key))
                 )
-               
+    
+    print("xml_base finished build")
 
-    #instantiate the recognizer and preprocess the template dictionary recursively
+
+
+    # instantiate the recognizer and preprocess the template dictionary recursively
     # R = rec.Recognizer(xml_base, protractor=True)
+    # print(xml_base["S01"]["arrowhead"]["01"])
+    R = rec.NDollarRecognizer(xml_base["S01"]["arrowhead"]["01"])
    
     # random100_test(R)
     

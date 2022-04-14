@@ -154,7 +154,7 @@ class NDollarRecognizer():
     #
     # The $N Gesture Recognizer API begins here -- 3 methods: Recognize(), AddGesture(), and DeleteUserGestures()
     #
-    def Recognize(self, strokes, useBoundedRotationInvariance, requireSameNoOfStrokes, useProtractor, preprocessed=False):
+    def Recognize(self, strokes, useBoundedRotationInvariance = True, requireSameNoOfStrokes = True, useProtractor = True, preprocessed=False):
         # takes in a list of strokes that are path objects
         if len(strokes) == 0:
             return Result("Null", 0.0, 0)
@@ -381,7 +381,7 @@ def DistanceAtBestAngle(points, T, a, b, threshold):
 
 # average distance between corresponding points in two paths
 def PathDistance(pts1, pts2):
-    d = 0.0;
+    d = 0.0
     # assumes pts1.length == pts2.length
     for p1, p2 in map(pts1, pts2):
         d += Distance(p1, p2)
