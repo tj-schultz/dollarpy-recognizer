@@ -62,7 +62,7 @@ class Path():
 
 
     def __len__(self):
-        return len(self.parsed_path)
+        return len(self.parsed_path) if self.parsed_path is not None else 0
 
     def __str__(self):
         path_str = 'Path length: %s\tPath:\n' % len(self)

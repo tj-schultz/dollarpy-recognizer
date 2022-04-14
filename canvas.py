@@ -28,6 +28,7 @@ class PathCanvas():
     down = False
     plotting = False
     path = pth.Path()
+    npath = pth.N_Path()
     resampled = pth.Path()
 
     C_WIDTH = 0
@@ -61,12 +62,13 @@ class PathCanvas():
     ## pen tool method to draw path
     def pen(self, event):
         if not self.down:
-            self.clear()
+
             self.toggle_down()
             start_x = event.x
             start_y = event.y
             self.path = pth.Path(pth.Point(start_x, start_y))
         else:
+            self.npath.stitch(self.path)
             self.toggle_down()
 
     ## log motion to the path structure using stitch
@@ -94,7 +96,7 @@ class PathCanvas():
                 self.log_motion(event.x, event.y)
 
                 ## if 2 or more points in path, draw a line with the last two points
-                if len(self.path) > 1 and self.down:
+                if self.path and len(self.path) > 1 and self.down:
                     self.canvas.create_line(self.path.parsed_path[-2].x, self.path.parsed_path[-2].y, \
                                             self.path.parsed_path[-1].x, self.path.parsed_path[-1].y,\
                                             width=line_pref["width"], fill=line_pref["fill"],\
@@ -118,8 +120,7 @@ class PathCanvas():
     ## clears the canvas
     def clear(self):
         ## dealloc list of Point objects
-        del self.path.parsed_path
-        self.path = pth.Path()
+        self.npath = pth.N_Path()
 
         ## clear Canvas object of all drawings
         self.canvas.delete("all")
