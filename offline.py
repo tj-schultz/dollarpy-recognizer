@@ -153,14 +153,14 @@ if __name__ == "__main__":
                                  % (prefix, file_key))
                 )
     
-    print("xml_base finished build")
 
 
 
     # instantiate the recognizer and preprocess the template dictionary recursively
     # R = rec.Recognizer(xml_base, protractor=True)
     # print(xml_base["S01"]["arrowhead"]["01"])
-    R = rec.NDollarRecognizer(xml_base["S01"]["arrowhead"]["01"])
+    R = rec.NDollarRecognizer()
+    R.recognize(xml_base["S01"]["arrowhead"]["01"])
    
     # random100_test(R)
     

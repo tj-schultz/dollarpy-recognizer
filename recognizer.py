@@ -736,7 +736,7 @@ def distance_at_best_angle(points, T, a, b, threshold):
     f1 = distance_at_angle(points, T, x1)
     x2 = (1.0 - PHI) * a + PHI * b
     f2 = distance_at_angle(points, T, x2)
-    while (fabs(b - a) > threshold):
+    while (math.fabs(b - a) > threshold):
         if f1 < f2:
             b = x2
             x2 = x1
