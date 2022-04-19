@@ -15,6 +15,12 @@ class Point():
         self.x = float(x)
         self.y = float(y)
 
+    def __str__(self):
+        return "({},{})".format(int(self.x), int(self.y))
+
+    def __repr__(self):
+        return "({},{})".format(int(self.x), int(self.y))
+
 ## N_Path class
 class N_Path():
     #stores the each uni-stroke of the multistoke gesture (N-strokes) as a separate list element

@@ -10,7 +10,6 @@ from math import acos, atan, atan2, pi, sin, cos, sqrt, dist, radians, inf, floo
 from math import pi as PI
 import path as pth
 import dollar
-import numpy as np
 from time import time
 from itertools import permutations
 from decimal import *

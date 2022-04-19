@@ -122,8 +122,8 @@ class MainApplication(tk.Frame):
         ## calculate results and update results entries
         npath = self.pathcanvas.npath
         nrecognizer = multi_rec(useBoundedRotationInvariance=True, useProtractor=True)
-        print(npath)
-        results = nrecognizer.recognize(npath)
+        print([s.parsed_path for s in npath.strokes])
+        results = nrecognizer.recognize([s.parsed_path for s in npath.strokes])
         # if len(results) > 0:
         self.score_entry.delete(0, tk.END)
         self.score_entry.insert(0, round(results.score, 2))

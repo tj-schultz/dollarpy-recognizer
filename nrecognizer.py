@@ -239,22 +239,6 @@ def heap_permute(n, order, orders):
     for p in permutations(order, n):
         newlist.append([i for i in p])
     return newlist
-    
-# def heap_permute(n, order, orders):
-#     if (n == 1):
-#         # append copy
-#         orders.append(order.copy())
-#         return orders
-#     else:
-#         for i in range(n):
-#             orders = heap_permute(n - 1, order, orders)
-#             if (n % 2 == 1):
-#                 # swap 0, n-1
-#                 order[0], order[n-1] = order[n-1], order[0]
-#             else:
-#                 # swap i, n-1
-#                 order[i], order[n-1] = order[n-1], order[i]
-#     return orders
 
 def make_unistrokes(strokes, orders):
     # array of point arrays
