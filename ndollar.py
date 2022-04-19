@@ -85,7 +85,7 @@ class Result():
         self.name = name
         self.score = score
         self.time = ms
-        print(name, " ", score, " ")
+        # print(name, " ", score)
 
 
 class NDollarRecognizer():
@@ -220,8 +220,9 @@ class NDollarRecognizer():
                         # n_best_list[multistroke.name] = (1.0 - d) if self.useProtractor else (1.0 - d / HALF_DIAGONAL)
         t1 = time()
         # print(n_best_list)
+        print("n_best_list:")
         for multistroke.name in n_best_list:
-            print(multistroke.name, n_best_list[multistroke.name])
+            print("\t", multistroke.name, n_best_list[multistroke.name])
         if n_best_list[m] >= 1:
             return Result("No match.", 0.0, t1-t0)
         else:
@@ -231,10 +232,10 @@ class NDollarRecognizer():
         pass
         # self.Multistrokes[len(self.Multistrokes)] = Multistroke(name, useBoundedRotationInvariance, strokes)
         # num = 0
-        for multistroke in self.Multistrokes:
-            if multistroke.Name == name:
-                num += 1
-        return num
+        # for multistroke in self.Multistrokes:
+        #     if multistroke.Name == name:
+        #         num += 1
+        # return num
     
     def DeleteUserGestures():
         pass

@@ -139,19 +139,20 @@ if __name__ == "__main__":
 
 
     ## build xml_base
-    for user_key in ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10"]:   ## for each user
-        xml_base[user_key] = {}                 ## add user key-dict
-        for prefix in xml_filetypes_multistroke:## for each gesture
-            xml_base[user_key][prefix] = {}     ## add prefix key-dict
-            for num in range(1, 11):            ## for each sample xml
-                file_key = str(num).zfill(2)
-                speed_key = "".join([user_key, str("finger-SLOW")])
+    # for user_key in ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10"]:   ## for each user
+    #     xml_base[user_key] = {}                 ## add user key-dict
+    #     for prefix in xml_filetypes_multistroke:## for each gesture
+    #         xml_base[user_key][prefix] = {}     ## add prefix key-dict
+    #         for num in range(1, 11):            ## for each sample xml
+    #             file_key = str(num).zfill(2)
+    #             speed_key = "".join([user_key, str("finger-SLOW")])
 
-                ## read as DOM -- append to dictionary
-                xml_base[user_key][prefix][file_key] = read_XML_path(\
-                    os.path.join(os.getcwd(), "Samples", user_key, speed_key, "%s-%s.xml"\
-                                 % (prefix, file_key))
-                )
+    #             ## read as DOM -- append to dictionary
+    #             xml_base[user_key][prefix][file_key] = read_XML_path(\
+    #                 os.path.join(os.getcwd(), "Samples", user_key, speed_key, "%s-%s.xml"\
+    #                              % (prefix, file_key))
+    #             )
+
     
 
 
@@ -160,7 +161,7 @@ if __name__ == "__main__":
     # R = rec.Recognizer(xml_base, protractor=True)
     # print(xml_base["S01"]["arrowhead"]["01"])
     R = rec.NDollarRecognizer()
-    R.recognize(xml_base["S01"]["arrowhead"]["01"])
+    R.recognize(read_XML_path("Samples/S01/S01finger-SLOW/arrowhead-01.xml"))
    
     # random100_test(R)
     
