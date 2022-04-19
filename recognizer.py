@@ -684,13 +684,13 @@ def scale_dim_to(points, size, ratio1D):
 
 # translates points' centroid
 def translate_to(points, pt):
-	c = centroid(points)
-	newpoints = []
-	for p in points:
-		qx = p.x + pt.x - c.x
-		qy = p.y + pt.y - c.y
-		newpoints.append(Point(qx, qy))
-	return newpoints
+    c = centroid(points)
+    newpoints = []
+    for p in points:
+        qx = p.x + pt.x - c.x
+        qy = p.y + pt.y - c.y
+        newpoints.append(Point(qx, qy))
+    return newpoints
 
 
 # for Protractor

@@ -53,7 +53,7 @@ class MainApplication(tk.Frame):
 
         #GUI -- Clear Canvas display
         self.clear_frame = tk.Frame(root)
-        self.clear_button = tk.Button(self.clear_frame, width=20, text="Clear Canvas", command=self.clear_canvas)
+        self.clear_button = tk.Button(self.clear_frame, width=20, text="Clear Canvas", command=self.submit)
         self.clear_frame.pack(side="top")
         self.clear_button.pack(side="left")
 
@@ -81,6 +81,7 @@ class MainApplication(tk.Frame):
         self.length_label.pack(side="left")
         self.length_entry.pack(side="left")
         self.length_entry.insert(0, "0.0")
+
 
 
         ## GUI -- Path length -- Path Points display
@@ -150,6 +151,31 @@ class MainApplication(tk.Frame):
         ## stops pen
         self.pathcanvas.pen(event)
 
+        ## get current loop information
+        s_index = 0
+        s_id = self.subject_entry.get()
+        g_id = int(self.samplenum_entry.get())
+        name = self.drawing_entry.get()
+        s_index = self.sample_types.index(name)
+        name += str(g_id).zfill(2)
+
+        ## write out
+        to_xml(path=self.pathcanvas.path, name=name, s_id=s_id, g_id=g_id)
+
+        ## increment loop
+        self.samplenum_entry.delete(0, tk.END)
+        if g_id == 10:
+            self.samplenum_entry.insert(0, 1)
+            self.drawing_entry.delete(0, tk.END)
+            if s_index < (len(self.sample_types)-1):
+                s_index = s_index + 1
+            else:
+                s_index = 0
+                self.subject_entry.delete(0, tk.END)
+                self.subject_entry.insert(0, "NULL")
+            self.drawing_entry.insert(0, self.sample_types[s_index])
+        else:
+            self.samplenum_entry.insert(0, g_id + 1)
 
         ## updates previous path length display
         length = float(self.length_entry.get())
@@ -164,7 +190,48 @@ class MainApplication(tk.Frame):
         if self.show_points.get():
             self.pathcanvas.draw_points(self.pathcanvas.resampled, cvs.line_pref["point_fill"])
 
-   
+    def clear_canvas(self, event):
+        self.pathcanvas.clear()
+    
+    ## xml path-to-file method
+def to_xml(path, name, s_id, g_id, speed="medium"):
+
+    ## create doc object
+    doc = xmlmd.Document()
+
+    ## create root
+    root = doc.createElement("Gesture")
+
+    ## write all root attributes
+    root.setAttribute("Name", name)
+    root.setAttribute("Subject", s_id)
+    root.setAttribute("Speed", speed)
+    root.setAttribute("Number", str(g_id))
+    root.setAttribute("NumPts", str(len(path)))
+    root.setAttribute("AppName", "dollarstore-notepad")
+    root.setAttribute("Date", str(datetime.datetime.now().date()))
+    root.setAttribute("Time", str(datetime.datetime.now().time()))
+
+    ## append root element
+    doc.appendChild(root)
+    for p in path.parsed_path:
+        point = doc.createElement("Point")
+        point.setAttribute("X", str(p.x))
+        point.setAttribute("Y", str(p.y))
+        point.setAttribute("T", str(datetime.datetime.now().time()))
+        root.appendChild(point)
+
+    ## write file out
+    try:
+        os.mkdir(s_id)
+    except:
+        print("")
+    with open("%s/%s.xml" % (s_id, ("%s-%s" % (s_id, name))), 'w') as f:
+        doc.writexml(f,
+                     indent="  ",
+                     addindent="  ",
+                     newl='\n')
+
 
         """
         test = self.R.preprocess(self.pathcanvas.path)
