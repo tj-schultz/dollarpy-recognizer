@@ -52,22 +52,22 @@ class OnlineRecognition(tk.Frame):
         #self.canvas.grid(padx=100)
         self.canvas.pack(side="top", fill="both", expand=False)
 
-        #GUI -- Clear Canvas display
+        #GUI -- Clear Canvas and Recognize Button display
         self.clear_frame = tk.Frame(root)
-        self.clear_button = tk.Button(self.clear_frame, width=20, text="Clear Canvas", command=self.clear_canvas)
+        self.clear_button = tk.Button(self.clear_frame, width=15, text="Clear Canvas", command=self.clear_canvas)
+        self.recog_button = tk.Button(self.clear_frame, width=20, text="Recognize", command=self.submit, bg="medium sea green")
         self.clear_frame.pack(side="top")
         self.clear_button.pack(side="left")
+        self.recog_button.pack(side="right")
 
 
         ## GUI -- Recognizer display
         self.recog_frame = tk.Frame(root)
         self.match_label = tk.Label(self.recog_frame, text="Best Match:")
-        self.match_entry = tk.Entry(self.recog_frame, width=32)
-        self.recog_button = tk.Button(self.recog_frame, width=16, text="Recognize", command=self.submit)
+        self.match_entry = tk.Entry(self.recog_frame, width=20)
         self.recog_frame.pack(side="top")
         self.match_label.pack(side="left")
         self.match_entry.pack(side="left")
-        self.recog_button.pack(side="bottom")
 
 
         ## GUI -- Path length display
@@ -113,7 +113,7 @@ class OnlineRecognition(tk.Frame):
             print("Icon import error")
 
         info_text = "This is a tkinter application\n running on python %s and developed for open use by\n"\
-        "TJ Schultz, Skylar McCain. 2022\n" \
+        "TJ Schultz, Skylar McCain, Spencer Bass 2022\n" \
         "\n\nDrag the mouse pointer to plot a single stroke path. Clicking again begins a new path.\n" \
         "After drawing, the recognizer will attempt to guess what you drew.\n"\
                 "Click the checkbox to plot the path points." % (sys.version)
@@ -207,56 +207,61 @@ class DataCollection(tk.Frame):
         self.canvas = tk.Canvas(root, width=C_WIDTH, height=C_HEIGHT, bg="lightgrey", \
                                          highlightthickness=5, highlightbackground="medium sea green")
 
+        
+        ## create a subjectID input above canvas
+        self.subject_frame = tk.Frame(root)
+        self.subject_label = tk.Label(self.subject_frame, text="SubjectID:")
+        self.subject_entry = tk.Entry(self.subject_frame, width=20, text="NULL")
+        self.subject_frame.pack(side="top")
+        self.subject_entry.pack(side="right")
+       
         ## create PathCanvas container object for Canvas
         self.pathcanvas = cvs.PathCanvas(root, self.canvas, C_WIDTH, C_HEIGHT)
 
 
         ## binding mouse events to Canvas object in tk frame, and tying them to functions in PathCanvas object
         self.canvas.bind("<Button-1>", self.pathcanvas.pen)
+        self.canvas.bind("<Button-3>", self.clear_canvas)
         self.canvas.bind("<Motion>", self.pathcanvas.draw_polyline)
         self.canvas.bind("<ButtonRelease-1>", self.update_path)
 
         ## pack canvas
         #self.canvas.grid(padx=100)
         self.canvas.pack(side="top", fill="both", expand=False)
-
-        #GUI -- Clear Canvas display
+        
+        #GUI -- Clear Canvas and Log Gesture
         self.clear_frame = tk.Frame(root)
-        self.clear_button = tk.Button(self.clear_frame, width=20, text="Clear Canvas", command=self.submit)
+        self.clear_button = tk.Button(self.clear_frame, width=15, text="Clear Canvas", command=self.clear_canvas)
+        self.submit_button = tk.Button(self.clear_frame, width=20, text="Log Gesture", command=self.submit)
         self.clear_frame.pack(side="top")
         self.clear_button.pack(side="left")
+        self.submit_button.pack(side="right")
+        self.subject_label.pack(side="bottom")
 
         ## GUI -- Prompt display
         self.prompt_frame = tk.Frame(root)
-        self.subject_label = tk.Label(self.prompt_frame, text="SubjectID:")
         self.drawing_label = tk.Label(self.prompt_frame, text="Drawing:")
-        self.subject_entry = tk.Entry(self.prompt_frame, width=16, text="NULL")
         self.samplenum_label = tk.Label(self.prompt_frame, text="Sample#:")
         self.drawing_entry = tk.Entry(self.prompt_frame, width=24)
         self.samplenum_entry = tk.Entry(self.prompt_frame, width=3)
+        
         self.prompt_frame.pack(side="top")
-        self.drawing_label.pack(side="top")
-        self.samplenum_label.pack(side="left")
-        self.drawing_entry.pack(side="top")
+        self.drawing_label.pack(side="left")
+        self.drawing_entry.pack(side="left")
+        self.samplenum_entry.pack(side="right")
+        self.samplenum_label.pack(side="right")
 
-        self.samplenum_entry.pack(side="left")
-        self.subject_entry.pack(side="bottom")
-        self.subject_label.pack(side="bottom")
-
-        self.subject_entry.insert(0, "NULL")
         self.drawing_entry.insert(0, self.sample_types[0])
         self.samplenum_entry.insert(0, 1)
-        """
-        ## GUI -- Recognizer display
-        self.recog_frame = tk.Frame(root)
-        self.match_label = tk.Label(self.recog_frame, text="Best Match:")
-        self.match_entry = tk.Entry(self.recog_frame, width=32)
-        self.recog_button = tk.Button(self.recog_frame, width=16, text="Recognize", command=self.submit)
-        self.recog_frame.pack(side="top")
-        self.match_label.pack(side="left")
-        self.match_entry.pack(side="left")
-        self.recog_button.pack(side="bottom")
-        """
+        
+        # ## GUI -- Recognizer display
+        # self.recog_frame = tk.Frame(root)
+        # self.match_label = tk.Label(self.recog_frame, text="Best Match:")
+        # self.match_entry = tk.Entry(self.recog_frame, width=32)
+        # self.recog_frame.pack(side="top")
+        # self.match_label.pack(side="left")
+        # self.match_entry.pack(side="left")
+
 
         ## GUI -- Path length and submission display
         self.length_frame = tk.Frame(root)
@@ -299,7 +304,7 @@ class DataCollection(tk.Frame):
             print("Icon import error")
 
         info_text = "This is a tkinter application\n running on python %s and developed for open use by\n"\
-        "TJ Schultz, Skylar McCain. 2022\n" \
+        "TJ Schultz, Skylar McCain, Spencer Bass. 2022\n" \
         "\n\nDrag the mouse pointer to plot a single stroke path. Clicking again begins a new path.\n" \
         "After drawing, the recognizer will attempt to guess what you drew.\n"\
                 "Click the checkbox to plot the path points." % (sys.version)
@@ -349,6 +354,8 @@ class DataCollection(tk.Frame):
         self.length_entry.delete(0, tk.END)
         self.length_entry.insert(0, 0.0)
 
+        self.clear_canvas()
+
     ## returns pointer position
     def get_pointer_pos(self, event):
         print(event.x, event.y)
@@ -367,8 +374,10 @@ class DataCollection(tk.Frame):
         if self.show_points.get():
             self.pathcanvas.draw_points(self.pathcanvas.resampled, cvs.line_pref["point_fill"])
 
-    def clear_canvas(self, event):
+    def clear_canvas(self, event=None):
         self.pathcanvas.clear()
+        self.length_entry.delete(0, tk.END)
+        self.length_entry.insert(0, 0.0)
     
     ## xml path-to-file method
 
@@ -444,15 +453,19 @@ class SelectionWindow(tk.Frame):
         self.data_collection_button = tk.Button(self.clear_frame, width=20, text="Data Collection", command=self.data_collection)
         
         self.clear_frame.pack(side="top")
-        self.online_button.pack(side="bottom")
-        self.data_collection_button.pack(side="bottom")
+        self.online_button.pack(side="left")
+        self.data_collection_button.pack(side="right")
 
     def online(self):
+        self.online_button.pack_forget()
+        self.data_collection_button.pack_forget()
         window = tk.Toplevel()
         OnlineRecognition(window).pack(side="top", fill="both", expand=True)
 
 
     def data_collection(self):
+        self.online_button.pack_forget()
+        self.data_collection_button.pack_forget()
         window = tk.Toplevel()
         DataCollection(window).pack(side="top", fill="both", expand=True)
 
