@@ -1,9 +1,12 @@
 """
 name: path.py -- dollargeneral-recognizer
 description: Path and point object definitions
-authors: TJ Schultz, Skylar McCain
-date: 4/4/22
+authors: TJ Schultz, Skylar McCain, Spencer Bass
+date: 4/19/22
 """
+import time
+import datetime
+
 class Point():
     ## point coordinates
     x = 0
@@ -40,7 +43,10 @@ class N_Path():
     
     #return the entire length of the multi-stoke path as a unitstroke
     def __len__(self):
-        return 
+        length = 0
+        for s in self.strokes:
+            length += len(s)
+        return length
     
     # def heap_permute(self, order, orders):
     #     if self.n == 1:
@@ -61,6 +67,7 @@ class N_Path():
 ## path class
 class Path():
     parsed_path = None
+    times = []
 
     def __init__(self, p=None):
 
@@ -84,6 +91,7 @@ class Path():
     ## appends point to end of path
     def stitch(self, p):
         self.parsed_path.append(p)
+        self.times.append(str(int(time.mktime(datetime.datetime.now().timetuple()))))
 
     ## inserts point at index i
     def insert(self, i, p):
