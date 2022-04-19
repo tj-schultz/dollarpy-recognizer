@@ -2,8 +2,8 @@
 name: recognizer.py -- dollargeneral-recognizer
 description: Recognizer class with member functions to resample, rotate, scale/translate paths and
 run calculations to determine the score for a particular recognizer
-authors: TJ Schultz, Skylar McCain
-date: 1/27/22
+authors: TJ Schultz, Skylar McCain, Spencer Bass
+date: 4/19/22
 """
 import math
 from math import acos, atan, atan2, pi, sin, cos, sqrt, dist, radians, inf, floor

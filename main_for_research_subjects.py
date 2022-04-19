@@ -4,13 +4,12 @@ description: An implementation of the $n-recognizer in python with a Canvas inpu
 authors: TJ Schultz, Skylar McCain
 date: 4/4/22
 """
-from datetime import datetime
+import datetime
 import os.path
 import time
 import tkinter as tk
 import canvas as cvs
 import sys
-import datetime
 import xml.dom.minidom as xmlmd
 
 import dollar
@@ -44,8 +43,10 @@ class MainApplication(tk.Frame):
 
         ## binding mouse events to Canvas object in tk frame, and tying them to functions in PathCanvas object
         self.canvas.bind("<Button-1>", self.pathcanvas.pen)
+        self.canvas.bind("<Button-3>", self.clear_canvas)
         self.canvas.bind("<Motion>", self.pathcanvas.draw_polyline)
         self.canvas.bind("<ButtonRelease-1>", self.update_path)
+
 
         ## pack canvas
         self.canvas.grid(padx=100)
@@ -113,7 +114,7 @@ class MainApplication(tk.Frame):
             print("Icon import error")
 
         info_text = "This is a tkinter application\n running on python %s and developed for open use by\n"\
-        "TJ Schultz, Skylar McCain. 2022\n" \
+        "TJ Schultz, Skylar McCain, Spencer Bass. 2022\n" \
         "\n\nDrag the mouse pointer to plot a single stroke path. Clicking again begins a new path.\n" \
         "After drawing, the recognizer will attempt to guess what you drew.\n"\
                 "Click the checkbox to plot the path points." % (sys.version)
@@ -124,6 +125,11 @@ class MainApplication(tk.Frame):
         #github_label = tk.Label(window, image=github_image)
         info_label.pack(side="top", fill="both", expand=False)
         #github_label.pack(side="top", fill="both", expand=False)
+    
+    def clear_canvas(self, event=None):
+        self.pathcanvas.clear()
+        self.length_entry.delete(0, tk.END)
+        self.length_entry.insert(0, 0.0)
 
     def submit(self):
         ## calculate results and update results entries
@@ -190,8 +196,6 @@ class MainApplication(tk.Frame):
         if self.show_points.get():
             self.pathcanvas.draw_points(self.pathcanvas.resampled, cvs.line_pref["point_fill"])
 
-    def clear_canvas(self, event):
-        self.pathcanvas.clear()
     
     ## xml path-to-file method
 def to_xml(path, name, s_id, g_id, speed="medium"):
@@ -225,7 +229,7 @@ def to_xml(path, name, s_id, g_id, speed="medium"):
     try:
         os.mkdir(s_id)
     except:
-        print("")
+        print("Failed to make directory for user input data storage")
     with open("%s/%s.xml" % (s_id, ("%s-%s" % (s_id, name))), 'w') as f:
         doc.writexml(f,
                      indent="  ",
