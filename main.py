@@ -12,7 +12,8 @@ import sys
 
 import dollar
 import path
-import recognizer as rec
+from recognizer import Recognizer as uni_rec
+from nrecognizer import Recognizer as multi_rec
 
 ## main application class defined for tkinter
 class MainApplication(tk.Frame):
@@ -90,8 +91,8 @@ class MainApplication(tk.Frame):
         self.info_frame.pack(side="bottom")
 
         ## recognizer instantiation
-        self.R = rec.NDollarRecognizer()
-        self.R_old = rec.Recognizer()
+        self.R = multi_rec()
+        self.R_old = uni_rec()
 
     ## prompts new info window for app
     def info_window(self):
@@ -120,9 +121,9 @@ class MainApplication(tk.Frame):
     def submit(self):
         ## calculate results and update results entries
         npath = self.pathcanvas.npath
-        nrecognizer = rec.NDollarRecognizer()
+        nrecognizer = multi_rec(useBoundedRotationInvariance=True, useProtractor=True)
         print(npath)
-        results = nrecognizer.Recognize(npath, False, False, False)
+        results = nrecognizer.recognize(npath)
         # if len(results) > 0:
         self.score_entry.delete(0, tk.END)
         self.score_entry.insert(0, round(results.score, 2))
