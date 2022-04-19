@@ -360,8 +360,6 @@ class DataCollection(tk.Frame):
         ## stops pen
         self.pathcanvas.pen(event)
 
-
-
         ## resample path
         self.pathcanvas.resampled = self.R_old.resample(self.pathcanvas.path, dollar.Dollar.prefs["n_points"])
 
@@ -390,16 +388,21 @@ def to_xml(path, name, s_id, g_id, speed="medium"):
     root.setAttribute("NumPts", str(len(path)))
     root.setAttribute("AppName", "dollarstore-notepad")
     root.setAttribute("Date", str(datetime.datetime.now().date()))
-    root.setAttribute("Time", str(datetime.datetime.now().time()))
+    root.setAttribute("Time", path.strokes[0].times[0])
 
     ## append root element
     doc.appendChild(root)
-    for p in path.parsed_path:
-        point = doc.createElement("Point")
-        point.setAttribute("X", str(p.x))
-        point.setAttribute("Y", str(p.y))
-        point.setAttribute("T", str(datetime.datetime.now().time()))
-        root.appendChild(point)
+    for s in path.strokes:
+        stroke = doc.createElement("Stroke")
+        i = 0
+        for p in s.parsed_path:
+            point = doc.createElement("Point")
+            point.setAttribute("X", str(p.x))
+            point.setAttribute("Y", str(p.y))
+            point.setAttribute("T", s.times[i])
+            stroke.appendChild(point)
+            i+=1
+        root.appendChild(stroke)
 
     ## write file out
     try:
