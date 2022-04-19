@@ -44,6 +44,7 @@ class MainApplication(tk.Frame):
 
         ## binding mouse events to Canvas object in tk frame, and tying them to functions in PathCanvas object
         self.canvas.bind("<Button-1>", self.pathcanvas.pen)
+        self.canvas.bind("<Button-3>", self.clear_canvas)
         self.canvas.bind("<Motion>", self.pathcanvas.draw_polyline)
         self.canvas.bind("<ButtonRelease-1>", self.update_path)
 
@@ -124,6 +125,11 @@ class MainApplication(tk.Frame):
         info_label.pack(side="top", fill="both", expand=False)
         #github_label.pack(side="top", fill="both", expand=False)
 
+    def clear_canvas(self, event=None):
+        self.pathcanvas.clear()
+        self.length_entry.delete(0, tk.END)
+        self.length_entry.insert(0, 0.0)
+
     def submit(self):
         ## calculate results and update results entries
         npath = self.pathcanvas.npath
@@ -135,9 +141,6 @@ class MainApplication(tk.Frame):
         self.score_entry.insert(0, round(results.score, 2))
         self.match_entry.delete(0, tk.END)
         self.match_entry.insert(0, results.name)
-        self.pathcanvas.clear()
-        self.length_entry.delete(0, tk.END)
-        self.length_entry.insert(0, 0.0)
 
     ## returns pointer position
     def get_pointer_pos(self, event):

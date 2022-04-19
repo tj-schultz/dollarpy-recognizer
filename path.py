@@ -4,14 +4,19 @@ description: Path and point object definitions
 authors: TJ Schultz, Skylar McCain
 date: 4/4/22
 """
-from point import Point
+class Point():
+    ## point coordinates
+    x = 0
+    y = 0
 
-
+    def __init__(self, x, y):
+        self.x = float(x)
+        self.y = float(y)
     def __str__(self):
-        return "({},{})".format(int(self.x), int(self.y))
+        return "({},{})".format(self.x, self.y)
 
     def __repr__(self):
-        return "({},{})".format(int(self.x), int(self.y))
+        return "({},{})".format(self.x, self.y)
 
 ## N_Path class
 class N_Path():
