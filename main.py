@@ -18,6 +18,31 @@ import path
 from recognizer import Recognizer as uni_rec
 from nrecognizer import Recognizer as multi_rec
 
+info_text = "This is a tkinter application\n running on python %s and developed for open use by\n"\
+    "TJ Schultz, Skylar McCain, Spencer Bass. 2022\n" \
+    "\n\nDrag the mouse pointer to plot a single stroke path. Clicking again begins a new path.\n" \
+    "After drawing, the recognizer will attempt to guess what you drew.\n"\
+    "Click the checkbox to plot the path points." % (sys.version)
+
+
+## prompts new info window for app
+def info_window(text):
+    window = tk.Toplevel()
+    window.title("Info")
+
+    ## open icon
+    try:
+        window.iconbitmap(os.path.join('resources', 'icon.ico'))
+    except:
+        print("Icon import error")
+
+    #github_image = tk.PhotoImage(file=os.path.join('resources', 'qr.png'))
+
+    info_label = tk.Label(window, text=text, justify="left")
+    #github_label = tk.Label(window, image=github_image)
+    info_label.pack(side="top", fill="both", expand=False)
+    #github_label.pack(side="top", fill="both", expand=False)
+
 ## main application class defined for tkinter
 class OnlineRecognition(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -92,7 +117,7 @@ class OnlineRecognition(tk.Frame):
 
         ## GUI -- App info
         self.info_frame = tk.Frame(root)
-        self.info_button = tk.Button(self.info_frame, text="?", command=self.info_window, font="d",\
+        self.info_button = tk.Button(self.info_frame, text="?", command=lambda: info_window(info_text), font="d",\
                                      bg="medium sea green")
         self.info_button.pack(side="right")
         self.info_frame.pack(side="bottom")
@@ -100,30 +125,6 @@ class OnlineRecognition(tk.Frame):
         ## recognizer instantiation
         self.R = multi_rec()
         self.R_old = uni_rec()
-
-    ## prompts new info window for app
-    def info_window(self):
-        window = tk.Toplevel()
-        window.title("Info")
-
-        ## open icon
-        try:
-            window.iconbitmap(os.path.join('resources', 'icon.ico'))
-        except:
-            print("Icon import error")
-
-        info_text = "This is a tkinter application\n running on python %s and developed for open use by\n"\
-        "TJ Schultz, Skylar McCain, Spencer Bass 2022\n" \
-        "\n\nDrag the mouse pointer to plot a single stroke path. Clicking again begins a new path.\n" \
-        "After drawing, the recognizer will attempt to guess what you drew.\n"\
-                "Click the checkbox to plot the path points." % (sys.version)
-
-        #github_image = tk.PhotoImage(file=os.path.join('resources', 'qr.png'))
-
-        info_label = tk.Label(window, text=info_text, justify="left")
-        #github_label = tk.Label(window, image=github_image)
-        info_label.pack(side="top", fill="both", expand=False)
-        #github_label.pack(side="top", fill="both", expand=False)
 
     def clear_canvas(self, event=None):
         self.pathcanvas.clear()
@@ -283,7 +284,7 @@ class DataCollection(tk.Frame):
 
         ## GUI -- App info
         self.info_frame = tk.Frame(root)
-        self.info_button = tk.Button(self.info_frame, text="?", command=self.info_window, font="d",\
+        self.info_button = tk.Button(self.info_frame, text="?", command=lambda: info_window(info_text), font="d",\
                                      bg="medium sea green")
         self.info_button.pack(side="right")
         self.info_frame.pack(side="bottom")
@@ -292,35 +293,15 @@ class DataCollection(tk.Frame):
         self.R = multi_rec()
         self.R_old = uni_rec()
 
-    ## prompts new info window for app
-    def info_window(self):
-        window = tk.Toplevel()
-        window.title("Info")
-
-        ## open icon
-        try:
-            window.iconbitmap(os.path.join('resources', 'icon.ico'))
-        except:
-            print("Icon import error")
-
-        info_text = "This is a tkinter application\n running on python %s and developed for open use by\n"\
-        "TJ Schultz, Skylar McCain, Spencer Bass. 2022\n" \
-        "\n\nDrag the mouse pointer to plot a single stroke path. Clicking again begins a new path.\n" \
-        "After drawing, the recognizer will attempt to guess what you drew.\n"\
-                "Click the checkbox to plot the path points." % (sys.version)
-
-        #github_image = tk.PhotoImage(file=os.path.join('resources', 'qr.png'))
-
-        info_label = tk.Label(window, text=info_text, justify="left")
-        #github_label = tk.Label(window, image=github_image)
-        info_label.pack(side="top", fill="both", expand=False)
-        #github_label.pack(side="top", fill="both", expand=False)
 
     ## submits path to file
     def submit(self):
         ## get current loop information
         s_index = 0
         s_id = self.subject_entry.get()
+        if s_id == "":
+            info_window("Error: Please enter a subject ID.")
+            return
         g_id = int(self.samplenum_entry.get())
         name = self.drawing_entry.get()
         s_index = self.sample_types.index(name)
