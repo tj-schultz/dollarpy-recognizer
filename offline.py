@@ -6,13 +6,14 @@ authors: TJ Schultz, Skylar McCain
 date: 2/01/22
 """
 
+from cgi import test
 from curses import keyname
 from xml.dom.minidom import parse
 import xml.dom.minidom as xmlmd
 import csv
 import os
 import path as pth
-import ndollar as rec
+import nrecognizer as rec
 import dollar
 import random
 import pandas as pd
@@ -55,7 +56,7 @@ def read_XML_path(filepath):
                 y = float(point.getAttribute("Y"))
                 xml_path.stitch(pth.Point(x, y))
             
-            multistrokes.append(xml_path)
+            multistrokes.append(xml_path.parsed_path)
 
         # text deebugging to find which files contained incomplete data
         # if len(xml_path) < 2:
@@ -67,7 +68,8 @@ def read_XML_path(filepath):
         
     return multistrokes
 
-def random100_test(R):
+def random100_test(test_files):
+    R = rec.Recognizer(useProtractor=True, input_templates=True)
 
     # dictionary to represent columns in output cvs file - converted to dataframe at end
     output = {
@@ -81,31 +83,33 @@ def random100_test(R):
         'RecoResultGesture' : [],
         'Correct/Incorrect' : [],
         'RecoResultScore' : [],
-        'RecoResultBestMatch' : [],
+        #'RecoResultBestMatch' : [],
         'RecoResultN-BestList' : []
     }
     # dictionary to store random list of templates each repetion of random100, size = 16 * e
     templates = {}
     # to store one randomly selected canidate for each gesture, size = 16
     canidates = {}
-    for user in R.preprocessed:
+    for user in test_files:
         # score to calculate overall user accuracy
         score = 0
         for e in range(1,9):
             for i in range(1,100):
-                for gesture in R.preprocessed[user]:
+                for gesture in test_files[user]:
+                    templates[gesture] = []
                     canidates[gesture] = {}
-                    for temp in random.sample(R.preprocessed[user][gesture].keys(), e + 1):
-                        id = "_".join([gesture,temp])
-                        templates[id] = R.preprocessed[user][gesture][temp]
-                    canidates[gesture][id] = templates.pop(id)
+                    random_temps = random.sample(test_files[user][gesture].keys(), e + 1)
+                    canidates[gesture] = random_temps.pop()
+                    for temp in random_temps:
+                        # add templates to recognizer multistroke set
+                        R.add_gesture(gesture,test_files[user][gesture][temp])
+                        templates[gesture].append(temp)
                 for gesture in canidates.keys():
-                    for canidate in canidates[gesture]:
-
+                        candidate = canidates[gesture]
                         #call recognizer on canidate with list of randomly generated templates from above
-                        n_best = R.recognize(canidates[gesture][canidate],templates)
-                        if len(n_best) == 0:
-                            print(user, gesture, canidate, templates.keys())
+                        result = R.recognize(test_files[user][gesture][candidate])
+                       
+                        n_best = result.n_best
                     
                         #write row elements to output dictionary
                         output['User'].append(user)
@@ -114,22 +118,23 @@ def random100_test(R):
                         output['NumberOfTraningExamples(E)'].append(e)
                         output['TotalSizeOfTrainingSet'].append(e*16)
                         output['TrainingSetContents'].append(list(templates.keys()))
-                        output['Candidate'].append(canidate)
+                        output['Candidate'].append(candidate)
 
                         #gets string of result gesture type
-                        reco_gesture = n_best[0][0].rsplit('_',1)[0]
+                        reco_gesture = result.name
                         output['RecoResultGesture'].append(reco_gesture)
                         output['Correct/Incorrect'].append('correct' if reco_gesture == gesture else 'incorrect')
-                        output['RecoResultScore'].append(n_best[0][1])
-                        output['RecoResultBestMatch'].append(n_best[0][0])
+                        output['RecoResultScore'].append(n_best[result.name] if result.name != "No match." else [])
+                        #output['RecoResultBestMatch'].append(n_best[0][0])
                         output['RecoResultN-BestList'].append(n_best)
 
                         if(reco_gesture == gesture):
                             score+=1
                 templates.clear()
-                canidates.clear()       
+                canidates.clear()
+                R.delete_all_templates()       
         print("user ", user, " completed random100 loop")
-    score_df = pd.DataFrame({'User' : ['AvgUserAccuracy'], 'GestureType' : [score/(100*16*9*len(R.preprocessed))], 'RandomIteration' : [''], 'NumberOfTrainingExamples(E)' : [''], 'TotalSizeOfTrainingSet' : [''], 'TrainingSetContents' : [''], 'Candidate' : [''], 'RecoResultGesture' : [''], 'Correct/Incorrect' : [''], 'RecoResultScore' : [''], 'RecoResultBestMatch' : [''], 'RecoResultN-BestList' : ['']})  
+    score_df = pd.DataFrame({'User' : ['AvgUserAccuracy'], 'GestureType' : [score/(100*16*9*10)], 'RandomIteration' : [''], 'NumberOfTrainingExamples(E)' : [''], 'TotalSizeOfTrainingSet' : [''], 'TrainingSetContents' : [''], 'Candidate' : [''], 'RecoResultGesture' : [''], 'Correct/Incorrect' : [''], 'RecoResultScore' : [''], 'RecoResultBestMatch' : [''], 'RecoResultN-BestList' : ['']})  
     output_df = pd.DataFrame(output)
     output_df = pd.concat([output_df, score_df])
     output_df.to_csv('random100_test_output.csv')
@@ -139,19 +144,22 @@ if __name__ == "__main__":
 
 
     ## build xml_base
-    # for user_key in ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10"]:   ## for each user
-    #     xml_base[user_key] = {}                 ## add user key-dict
-    #     for prefix in xml_filetypes_multistroke:## for each gesture
-    #         xml_base[user_key][prefix] = {}     ## add prefix key-dict
-    #         for num in range(1, 11):            ## for each sample xml
-    #             file_key = str(num).zfill(2)
-    #             speed_key = "".join([user_key, str("finger-SLOW")])
+    ## for Multistroke gesture log from N$ site
+    for user_key in ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10"]:   ## for each user
+        xml_base[user_key] = {}                 ## add user key-dict
+        for prefix in xml_filetypes_multistroke:## for each gesture
+            xml_base[user_key][prefix] = {}     ## add prefix key-dict
+            for num in range(1, 11):            ## for each sample xml
+                file_key = str(num).zfill(2)
+                speed_key = "".join([user_key, str("finger-SLOW")])
 
-    #             ## read as DOM -- append to dictionary
-    #             xml_base[user_key][prefix][file_key] = read_XML_path(\
-    #                 os.path.join(os.getcwd(), "Samples", user_key, speed_key, "%s-%s.xml"\
-    #                              % (prefix, file_key))
-    #             )
+                ## read as DOM -- append to dictionary
+                xml_base[user_key][prefix][file_key] = read_XML_path(\
+                    os.path.join(os.getcwd(), "Samples", user_key, speed_key, "%s-%s.xml"\
+                                 % (prefix, file_key))
+                )
+    
+    print("xml_base finished build")
 
     
 
@@ -160,8 +168,7 @@ if __name__ == "__main__":
     # instantiate the recognizer and preprocess the template dictionary recursively
     # R = rec.Recognizer(xml_base, protractor=True)
     # print(xml_base["S01"]["arrowhead"]["01"])
-    R = rec.NDollarRecognizer()
-    R.recognize(read_XML_path("Samples/S01/S01finger-SLOW/arrowhead-01.xml"))
+    random100_test(xml_base)
    
     # random100_test(R)
     
