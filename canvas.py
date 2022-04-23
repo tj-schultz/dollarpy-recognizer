@@ -1,8 +1,8 @@
 """
 name: canvas.py -- dollargeneral-recognizer
 description: Canvas tkinter definitions
-authors: TJ Schultz, Skylar McCain
-date: 4/4/22
+authors: TJ Schultz, Skylar McCain, Spencer Bass
+date: 4/20/22
 """
 
 import tkinter as tk

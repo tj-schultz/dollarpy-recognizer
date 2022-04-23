@@ -12,6 +12,7 @@ import path as pth
 import dollar
 from time import time
 
+
 ## recognizer class containing canvas display methods for
 class Recognizer():
     preprocessed = {}

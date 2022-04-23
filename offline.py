@@ -2,8 +2,8 @@
 name: offline.py -- dollargeneral-recognizer
 description: alternative launch to perform a recognition loop
 and log results offline
-authors: TJ Schultz, Skylar McCain
-date: 2/01/22
+authors: TJ Schultz, Skylar McCain, Spencer Bass
+date: 4/20/22
 """
 
 from cgi import test
@@ -17,14 +17,18 @@ import nrecognizer as rec
 import dollar
 import random
 import pandas as pd
+import time
 
 ## list of path types to read using filenames with '01-10' appended
 xml_filetypes_unistroke = ["arrow", "caret", "check", "circle", "delete_mark", "left_curly_brace",\
                  "left_sq_bracket", "pigtail", "zig_zag", "rectangle",\
                  "right_curly_brace", "right_sq_bracket", "star", "triangle",\
                  "v", "x"]
-xml_filetypes_multistroke = ["arrowhead", "asterisk", "D", "exclamation_point", "five_point_star",\
+xml_filetypes_multistroke_MMG = ["arrowhead", "asterisk", "D", "exclamation_point", "five_point_star",\
                  "H", "half_note", "I", "line", "N", "null", "P", "pitchfork", "six_point_star", \
+                 "T", "X"]
+xml_filetypes_multistroke_ND = ["arrowhead", "asterisk", "D", "exclamation", "five-point star",\
+                 "H", "half-note", "I", "line", "N", "null", "P", "pitchfork", "six-point star", \
                  "T", "X"]
 
 ## base dictionary of unprocessed input Path objects from xml
@@ -69,7 +73,7 @@ def read_XML_path(filepath):
     return multistrokes
 
 def random100_test(test_files):
-    R = rec.Recognizer(useProtractor=True, input_templates=True)
+    R = rec.Recognizer(useProtractor=False, input_templates=True)
 
     # dictionary to represent columns in output cvs file - converted to dataframe at end
     output = {
@@ -90,11 +94,15 @@ def random100_test(test_files):
     templates = {}
     # to store one randomly selected canidate for each gesture, size = 16
     canidates = {}
+
+    # score to calculate overall user accuracy
+    score = 0
+    total=0
+    e_scores = [0] * 9
     for user in test_files:
-        # score to calculate overall user accuracy
-        score = 0
+        start = time.time()
         for e in range(1,9):
-            for i in range(1,100):
+            for i in range(1,101):
                 for gesture in test_files[user]:
                     templates[gesture] = []
                     canidates[gesture] = {}
@@ -108,7 +116,7 @@ def random100_test(test_files):
                         candidate = canidates[gesture]
                         #call recognizer on canidate with list of randomly generated templates from above
                         result = R.recognize(test_files[user][gesture][candidate])
-                       
+
                         n_best = result.n_best
                     
                         #write row elements to output dictionary
@@ -124,53 +132,81 @@ def random100_test(test_files):
                         reco_gesture = result.name
                         output['RecoResultGesture'].append(reco_gesture)
                         output['Correct/Incorrect'].append('correct' if reco_gesture == gesture else 'incorrect')
-                        output['RecoResultScore'].append(n_best[result.name] if result.name != "No match." else [])
-                        #output['RecoResultBestMatch'].append(n_best[0][0])
+                        if(reco_gesture == "Null" or reco_gesture == "No match."):
+                             output['RecoResultScore'].append("empty file")
+                        else: 
+                            output['RecoResultScore'].append(n_best[result.name])
+                            total+=1
+                        #olist indices must be integers or slices, not strmc vutput['RecoResultBestMatch'].append(n_best[0][0])
                         output['RecoResultN-BestList'].append(n_best)
 
                         if(reco_gesture == gesture):
-                            score+=1
+                            #add overall accuracy score
+                            score=score+1
+                             #compute average accuracy score for each level of e
+                            e_scores[e-1]+=1
+
                 templates.clear()
                 canidates.clear()
-                R.delete_all_templates()       
+                R.delete_all_templates()  
+        end = time.time()  
         print("user ", user, " completed random100 loop")
-    score_df = pd.DataFrame({'User' : ['AvgUserAccuracy'], 'GestureType' : [score/(100*16*9*10)], 'RandomIteration' : [''], 'NumberOfTrainingExamples(E)' : [''], 'TotalSizeOfTrainingSet' : [''], 'TrainingSetContents' : [''], 'Candidate' : [''], 'RecoResultGesture' : [''], 'Correct/Incorrect' : [''], 'RecoResultScore' : [''], 'RecoResultBestMatch' : [''], 'RecoResultN-BestList' : ['']})  
+        print("\t execution time of user ", user, ": ", end-start)
+    score_df = pd.DataFrame({'User' : ['AvgUserAccuracy'], 'GestureType' : [score/total], 'RandomIteration' : [''], 'NumberOfTrainingExamples(E)' : [''], 'TotalSizeOfTrainingSet' : [''], 'TrainingSetContents' : [''], 'Candidate' : [''], 'RecoResultGesture' : [''], 'Correct/Incorrect' : [''], 'RecoResultScore' : [''], 'RecoResultBestMatch' : [''], 'RecoResultN-BestList' : ['']})  
     output_df = pd.DataFrame(output)
     output_df = pd.concat([output_df, score_df])
     output_df.to_csv('random100_test_output.csv')
+
+     #output average accuracy for each level of e
+    e_avg_err= {'Eaverages': []}
+    for lev in range(0,9):
+          # e_score/(number of gestures * number of users * number of repetions)
+        e_avg_err['Eaverages'].append(1-(e_scores[lev]/16*9*len(test_files.keys())))
+   
+    e_avg_output = pd.DataFrame(e_avg_err)
+    e_avg_output.to_csv('average_for_e_levels.csv')
     
    
 if __name__ == "__main__":
 
 
     ## build xml_base
-    ## for Multistroke gesture log from N$ site
-    for user_key in ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10"]:   ## for each user
+    # ## for Multistroke gesture log from N$ site (MMG)
+    # for user_key in ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10"]:   ## for each user
+    #     xml_base[user_key] = {}                 ## add user key-dict
+    #     for prefix in xml_filetypes_multistroke_MMG:## for each gesture
+    #         xml_base[user_key][prefix] = {}     ## add prefix key-dict
+    #         for num in range(1, 11):            ## for each sample xml
+    #             file_key = str(num).zfill(2)
+    #             speed_key = "".join([user_key, str("finger-SLOW")])
+
+    #             ## read as DOM -- append to dictionary
+    #             xml_base[user_key][prefix][file_key] = read_XML_path(\
+    #                 os.path.join(os.getcwd(), "Samples", user_key, speed_key, "%s-%s.xml"\
+    #                              % (prefix, file_key))
+    #             )
+
+    ## for New Data
+    for user_key in ["S01", "S02", "S03", "S04", "S05", "S06"]:   ## for each user
         xml_base[user_key] = {}                 ## add user key-dict
-        for prefix in xml_filetypes_multistroke:## for each gesture
+        for prefix in xml_filetypes_multistroke_ND:## for each gesture
             xml_base[user_key][prefix] = {}     ## add prefix key-dict
             for num in range(1, 11):            ## for each sample xml
                 file_key = str(num).zfill(2)
-                speed_key = "".join([user_key, str("finger-SLOW")])
 
                 ## read as DOM -- append to dictionary
                 xml_base[user_key][prefix][file_key] = read_XML_path(\
-                    os.path.join(os.getcwd(), "Samples", user_key, speed_key, "%s-%s.xml"\
+                    os.path.join(os.getcwd(), "NewData", user_key, "%s%s.xml"\
                                  % (prefix, file_key))
                 )
     
     print("xml_base finished build")
 
-    
 
 
-
-    # instantiate the recognizer and preprocess the template dictionary recursively
-    # R = rec.Recognizer(xml_base, protractor=True)
-    # print(xml_base["S01"]["arrowhead"]["01"])
     random100_test(xml_base)
    
-    # random100_test(R)
+  
     
 
     ## debug -- vectors should be of length 2 * 64 = 128

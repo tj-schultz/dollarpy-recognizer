@@ -1,8 +1,8 @@
 """
 name: main.py -- dollargeneral-recognizer
 description: An implementation of the $n-recognizer in python with a Canvas input
-authors: TJ Schultz, Skylar McCain
-date: 4/4/22
+authors: TJ Schultz, Skylar McCain, Spencer Bass
+date: 4/20/22
 """
 from datetime import datetime
 import os.path
@@ -135,7 +135,6 @@ class OnlineRecognition(tk.Frame):
         ## calculate results and update results entries
         npath = self.pathcanvas.npath
         nrecognizer = multi_rec(useBoundedRotationInvariance=True, useProtractor=True)
-        print([s.parsed_path for s in npath.strokes])
         results = nrecognizer.recognize([s.parsed_path for s in npath.strokes])
         # if len(results) > 0:
         self.score_entry.delete(0, tk.END)
@@ -169,21 +168,6 @@ class OnlineRecognition(tk.Frame):
             self.pathcanvas.draw_points(self.pathcanvas.resampled, cvs.line_pref["point_fill"])
 
    
-
-        """
-        test = self.R.preprocess(self.pathcanvas.path)
-        test_temp = self.R.preprocess(dollar.Dollar.templates["zig-zag"])
-        for p in test.parsed_path:
-            p.x += 150
-            p.y += 150
-        for q in test_temp.parsed_path:
-            q.x += 150
-            q.y += 150
-        
-
-        self.pathcanvas.draw_points(test, color="blue")
-        self.pathcanvas.draw_points(test_temp, color="green")
-        """
 
 
 class DataCollection(tk.Frame):
@@ -339,7 +323,6 @@ class DataCollection(tk.Frame):
 
     ## returns pointer position
     def get_pointer_pos(self, event):
-        print(event.x, event.y)
         return (event.x, event.y)
 
     ## calls pen to end drawing and updates the path length entry, then calls method to recognize
@@ -406,20 +389,6 @@ def to_xml(path, name, s_id, g_id, speed="medium"):
                      newl='\n')
 
 
-        """
-        test = self.R.preprocess(self.pathcanvas.path)
-        test_temp = self.R.preprocess(dollar.Dollar.templates["zig-zag"])
-        for p in test.parsed_path:
-            p.x += 150
-            p.y += 150
-        for q in test_temp.parsed_path:
-            q.x += 150
-            q.y += 150
-        
-
-        self.pathcanvas.draw_points(test, color="blue")
-        self.pathcanvas.draw_points(test_temp, color="green")
-        """
 
 
 class SelectionWindow(tk.Frame):
